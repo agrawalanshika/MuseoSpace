@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseoSpace - Artwork Details</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ---------------- BROWNISH THEME ---------------- */
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: linear-gradient(
+                to bottom,
+                rgba(210, 180, 150, 0.75),
+                rgba(185, 155, 125, 0.78),
+                rgba(165, 140, 110, 0.82)
+            );
+            color: #2c2c2c;
+            overflow-x: hidden;
+        }
+
+        /* Background Image Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url("background.jpg") center/cover no-repeat;
+            opacity: 0.18;
+            z-index: -10;
+            transform: scale(1.15);
+        }
+
+        /* Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            background: linear-gradient(
+                to right,
+                rgba(90, 70, 50, 0.92),
+                rgba(70, 52, 38, 0.95),
+                rgba(55, 40, 28, 0.97)
+            );
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 230, 200, 0.25);
+        }
+
+        .nav-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid rgba(255, 230, 200, 0.4);
+            color: #f7e7c9;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            transition: 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #f7e7c9;
+            color: #3a281c;
+        }
+
+        .nav-logo {
+            font-size: 1.4rem;
+            letter-spacing: 0.18em;
+            color: #f8e7cc;
+            cursor: pointer;
+            text-shadow: 0 0 8px rgba(255, 240, 210, 0.6);
+        }
+
+        .favorite-btn {
+            background: transparent;
+            border: 2px solid rgba(255, 230, 200, 0.4);
+            color: #f7e7c9;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: 0.3s ease;
+        }
+
+        .favorite-btn:hover,
+        .favorite-btn.favorited {
+            background: #d4af37;
+            border-color: #d4af37;
+            color: #3a281c;
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .artwork-container {
+            margin-top: 120px;
+            padding: 3rem;
+            max-width: 1800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .artwork-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        /* Image Section */
+        .image-section {
+            position: sticky;
+            top: 120px;
+        }
+
+        .image-wrapper {
+            position: relative;
+            background: rgba(255, 250, 240, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 25px 65px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-artwork {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s ease;
+            cursor: zoom-in;
+        }
+
+        .image-wrapper:hover .main-artwork {
+            transform: scale(1.05);
+        }
+
+        .image-wrapper.zoomed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 20, 10, 0.95);
+            cursor: zoom-out;
+        }
+
+        .zoom-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(70, 52, 38, 0.85);
+            color: #f7e7c9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: 0.3s ease;
+        }
+
+        .image-wrapper:hover .zoom-indicator {
+            opacity: 1;
+        }
+
+        /* Details Section */
+        .details-section {
+            animation: fadeInRight 1s ease;
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .artwork-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: #3a281c;
+            margin-bottom: 1rem;
+        }
+
+        .artwork-artist {
+            font-size: 1.8rem;
+            color: #8a6a4d;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 248, 235, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(120, 80, 50, 0.2);
+        }
+
+        .metadata-label {
+            font-size: 0.9rem;
+            color: #6e4c34;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .metadata-value {
+            font-size: 1.3rem;
+            color: #3a281c;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: #b8895a;
+            margin: 3rem 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #5a3f2a;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .description-text {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: #3e2b1d;
+            margin-bottom: 2rem;
+        }
+
+        .curator-notes {
+            padding: 2rem;
+            background: rgba(120, 80, 50, 0.15);
+            border-left: 4px solid #b8895a;
+            border-radius: 4px;
+            margin-bottom: 3rem;
+        }
+
+        .curator-notes-title {
+            font-size: 1.1rem;
+            color: #6e4c34;
+            font-weight: 600;
+        }
+
+        .curator-notes-text {
+            font-size: 1.1rem;
+            color: #3e2b1d;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 1.2rem;
+            background: rgba(255, 245, 230, 0.75);
+            border: 2px solid #6a4a32;
+            color: #4a2f1e;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.12em;
+            transition: 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:hover {
+            background: #6a4a32;
+            color: #fff6e6;
+        }
+
+        .action-btn.primary {
+            background: #b8895a;
+            border-color: #b8895a;
+            color: #fff;
+        }
+
+        .action-btn.primary:hover {
+            background: #946c44;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .artwork-layout {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .image-section {
+                position: relative;
+                top: 0;
+            }
+
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <button class="back-btn" onclick="goBack()">← BACK TO GALLERY</button>
+            <div class="nav-logo" onclick="goHome()">MUSEOSPACE</div>
+            <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">♡</button>
+        </div>
+    </nav>
+
+    <!-- Main Artwork Section -->
+    <div class="artwork-container">
+        <div class="artwork-layout">
+
+            <!-- Image -->
+            <div class="image-section">
+                <div class="image-wrapper" id="imageWrapper" onclick="toggleZoom()">
+                    <img class="main-artwork" id="mainArtwork" src="" alt="">
+                    <div class="zoom-indicator">Click to Zoom</div>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="details-section">
+                <h1 class="artwork-title" id="artworkTitle"></h1>
+                <p class="artwork-artist" id="artworkArtist"></p>
+
+                <div class="metadata-grid">
+                    <div>
+                        <span class="metadata-label">Year</span>
+                        <span class="metadata-value" id="artworkYear"></span>
+                    </div>
+                    <div>
+                        <span class="metadata-label">Medium</span>
+                        <span class="metadata-value" id="artworkMedium"></span>
+                    </div>
+                    <div>
+                        <span class="metadata-label">Style</span>
+                        <span class="metadata-value" id="artworkStyle"></span>
+                    </div>
+                    <div>
+                        <span class="metadata-label">Location</span>
+                        <span class="metadata-value" id="artworkLocation"></span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <h3 class="section-title">About This Artwork</h3>
+                <p class="description-text" id="artworkDescription"></p>
+
+                <div class="curator-notes">
+                    <div class="curator-notes-title">Curator's Note</div>
+                    <p class="curator-notes-text" id="curatorNotes"></p>
+                </div>
+
+                <div class="action-section">
+                    <button class="action-btn" onclick="shareArtwork()">SHARE ARTWORK</button>
+                    <button class="action-btn" onclick="downloadInfo()">DOWNLOAD INFO</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Section -->
+    <script>
+        let isFavorited = false;
+
+        function initArtworkPage() {
+            const artworkData = JSON.parse(sessionStorage.getItem('selectedArtwork'));
+
+            if (!artworkData) {
+                populateDefaultArtwork();
+                return;
+            }
+
+            document.getElementById('artworkTitle').textContent = artworkData.title;
+            document.getElementById('artworkArtist').textContent = artworkData.artist;
+            document.getElementById('artworkYear').textContent = artworkData.year;
+            document.getElementById('artworkMedium').textContent = artworkData.medium;
+            document.getElementById('artworkStyle').textContent = artworkData.style;
+            document.getElementById('artworkLocation').textContent = artworkData.location;
+            document.getElementById('artworkDescription').textContent = artworkData.description;
+            document.getElementById('curatorNotes').textContent = artworkData.curatorNotes;
+            document.getElementById('mainArtwork').src = artworkData.image;
+
+            checkFavoriteStatus();
+        }
+
+        function populateDefaultArtwork() {
+            document.getElementById('artworkTitle').textContent = "The Starry Night";
+            document.getElementById('artworkArtist').textContent = "Vincent van Gogh";
+            document.getElementById('artworkYear').textContent = "1889";
+            document.getElementById('artworkMedium').textContent = "Oil on canvas";
+            document.getElementById('artworkStyle').textContent = "Post-Impressionism";
+            document.getElementById('artworkLocation').textContent = "MoMA, New York";
+            document.getElementById('artworkDescription').textContent =
+                "One of the most recognized artworks in the world.";
+            document.getElementById('curatorNotes').textContent =
+                "A masterpiece of swirling motion.";
+            document.getElementById('mainArtwork').src =
+                "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200";
+        }
+
+        function toggleZoom() {
+            document.getElementById('imageWrapper').classList.toggle('zoomed');
+        }
+
+        function toggleFavorite() {
+            const btn = document.getElementById('favoriteBtn');
+            isFavorited = !isFavorited;
+
+            if (isFavorited) {
+                btn.classList.add('favorited');
+                btn.textContent = '♥';
+                showNotification('Added to favorites!');
+            } else {
+                btn.classList.remove('favorited');
+                btn.textContent = '♡';
+                showNotification('Removed from favorites');
+            }
+        }
+
+        function checkFavoriteStatus() {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const artwork = JSON.parse(sessionStorage.getItem('selectedArtwork'));
+
+            if (artwork && favorites.includes(artwork.id)) {
+                isFavorited = true;
+                document.getElementById('favoriteBtn').classList.add('favorited');
+                document.getElementById('favoriteBtn').textContent = '♥';
+            }
+        }
+
+        function shareArtwork() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification("Link copied!");
+            });
+        }
+
+        function downloadInfo() {
+            const artwork = JSON.parse(sessionStorage.getItem("selectedArtwork"));
+            if (!artwork) return;
+
+            const textContent =
+                `TITLE: ${artwork.title}\nARTIST: ${artwork.artist}\nYEAR: ${artwork.year}`;
+
+            const blob = new Blob([textContent], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${artwork.title}.txt`;
+            a.click();
+            showNotification("Info downloaded");
+        }
+
+        function goBack() {
+            window.location.href = "gallery_walkthrough.html";
+        }
+
+        function goHome() {
+            window.location.href = "home_page.html";
+        }
+
+        function showNotification(msg) {
+            const n = document.createElement("div");
+            n.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: #b8895a;
+                color: #fff;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                z-index: 9999;
+                font-size: 1rem;
+                letter-spacing: 0.1em;
+                animation: fadeSlide 3s ease forwards;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            `;
+            n.textContent = msg;
+            document.body.appendChild(n);
+
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
+            @keyframes fadeSlide {
+                0% { opacity: 0; transform: translateX(50px); }
+                15% { opacity: 1; transform: translateX(0); }
+                85% { opacity: 1; }
+                100% { opacity: 0; transform: translateX(50px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        initArtworkPage();
+    </script>
+
+</body>
+</html>

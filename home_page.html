@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseoSpace - Lobby</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Playfair Display', Georgia, serif;
+            overflow: hidden;
+            background: #1c0f0a; /* Brownish-black */
+            color: #fff;
+        }
+
+        /* ---------------- NAVIGATION BAR ---------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.2rem 3rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+            backdrop-filter: blur(12px);
+            background: rgba(40, 20, 10, 0.35); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            font-size: 0.55rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 235, 200, 0.85);
+            cursor: pointer;
+            transition: 0.3s ease;
+            padding-bottom: 6px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #ffd9a0;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: #ffd9a0;
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        /* ------------------------------------------------ */
+
+        .lobby-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Brownish-Black Gradient Background */
+        .gradient-bg {
+    position: absolute;
+    inset: 0;
+    background: url("background.jpg") no-repeat center center/cover;
+    z-index: 1;
+
+    /* Cinematic look */
+    filter: brightness(0.45) blur(1px);
+
+    /* Smooth slow zoom effect */
+    animation: bgZoom 10s ease-in-out infinite alternate;
+}
+
+/* Slow zoom animation */
+@keyframes bgZoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.08); }
+}
+
+/* GLASS + Glow overlay */
+.gradient-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(2px);
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 225, 180, 0.15),
+        rgba(0, 0, 0, 0.7)
+    );
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 225, 190, 0.6);
+            border-radius: 50%;
+            animation: float-particle 20s infinite ease-in-out;
+        }
+
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(50px); opacity: 0.8; }
+            50% { transform: translateY(-50px) translateX(-50px); opacity: 0.5; }
+            75% { transform: translateY(-150px) translateX(100px); opacity: 0.7; }
+        }
+
+        /* Art Frames */
+        .art-frame {
+            position: absolute;
+            border: 2px solid rgba(255, 220, 190, 0.1);
+            background: rgba(255, 230, 200, 0.03);
+            backdrop-filter: blur(10px);
+            animation: frameFloat 25s infinite ease-in-out;
+            z-index: 2;
+        }
+
+        @keyframes frameFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+            50% { transform: translateY(-40px) rotate(3deg); opacity: 0.25; }
+        }
+
+        /* Main Content */
+        .lobby-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .museum-logo {
+            font-size: clamp(4rem, 7.5vw, 5.5rem); /* Adjusted for perfect fit */
+            font-weight: 300;
+            letter-spacing: 0.25em;
+            background: linear-gradient(135deg, #ffe6c7, #caa47a, #ffe2c0);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s ease infinite;
+            text-shadow: 0 0 50px rgba(255, 210, 160, 0.4);
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 2.2vw, 1.7rem);
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease 0.3s forwards;
+            letter-spacing: 0.3em;
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            opacity: 0;
+            animation: fadeInUp 1.5s ease 0.7s forwards;
+            margin-bottom: 3rem;
+            letter-spacing: 0.15em;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start Button */
+        .start-button {
+            padding: 1.6rem 4rem;
+            font-size: 1.2rem;
+            background: transparent;
+            border: 2px solid #ffe6c7;
+            color: #ffe6c7;
+            letter-spacing: 0.25em;
+            cursor: pointer;
+            transition: 0.4s ease;
+        }
+
+        .start-button:hover {
+            background: #ffe6c7;
+            color: #2c1b12;
+            transform: scale(1.06);
+        }
+
+        /* Music Control */
+        .music-control {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            background: rgba(255, 220, 190, 0.2);
+            border: 1px solid rgba(255, 220, 190, 0.4);
+        }
+        
+/* ZOOM IN animation for background + content + particles */
+.zoom-in {
+    animation: zoomInAll 2.5s ease forwards;
+}
+
+@keyframes zoomInAll {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.25); /* zooms IN */
+    }
+}
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION BAR -->
+
+    <div class="lobby-container">
+        <div class="gradient-bg"></div>
+
+        <div class="particles">
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        </div>
+
+        <div class="art-frame"></div>
+        <div class="art-frame"></div>
+        <div class="art-frame"></div>
+
+        <div class="lobby-content">
+            <h1 class="museum-logo">MUSEOSPACE</h1>
+            <p class="tagline">A Cinematic Journey</p>
+            <p class="subtitle">Where Art Meets Technology</p>
+            <button class="start-button" onclick="startExhibition()">
+                ENTER EXHIBITION
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function startExhibition() {
+    const content = document.querySelector('.lobby-content');
+    const bg = document.querySelector('.gradient-bg');
+    const particles = document.querySelector('.particles');
+
+    // Add zoom-in to all main elements
+    content.classList.add("zoom-in");
+    bg.classList.add("zoom-in");
+    particles.classList.add("zoom-in");
+
+    // Move to next page after animation
+    setTimeout(() => {
+        window.location.href = "gallery_walkthrough.html";
+    }, 2000);
+}
+
+
+    </script>
+
+</body>
+</html>

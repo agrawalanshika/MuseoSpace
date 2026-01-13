@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseoSpace - Share Your Experience</title>
+
+    <!-- Heavy Cormorant Garamond -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ⭐ DARKER BROWN THEME */
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;                 /* SAME as Restart Tour */
+            letter-spacing: 0.12em;           /* SAME as Restart Tour */
+            background: linear-gradient(
+                to bottom,
+                rgba(55,40,28,0.94),
+                rgba(40,28,18,0.96),
+                rgba(30,20,12,0.97)
+            );
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        /* ⭐ DARKER ZOOM BACKGROUND IMAGE */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url("background.jpg") center/cover no-repeat;
+            opacity: 0.10;         /* darker overlay */
+            z-index: -2;
+            transform: scale(1.30);
+            animation: zoomPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes zoomPulse {
+            0%   { transform: scale(1.30); }
+            50%  { transform: scale(1.15); }
+            100% { transform: scale(1.30); }
+        }
+
+        /* MAIN BOX */
+        .feedback-container {
+            width: 100%;
+            max-width: 720px;
+            background: rgba(255, 247, 235, 0.97);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 22px 55px rgba(0,0,0,0.45);
+        }
+
+        /* HEADER */
+        .feedback-header {
+            padding: 1.8rem 1rem;
+            background: linear-gradient(
+                to right,
+                #4d3625,
+                #3a281c,
+                #2a1c13
+            );
+            color: #f8e7cc;
+            text-align: center;
+            text-shadow: 0 0 14px rgba(255, 240, 210, 1);
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;   /* heavy like buttons */
+            letter-spacing: 0.12em;
+        }
+
+        .feedback-header h1 {
+            font-size: 2.4rem;
+        }
+
+        .feedback-header p {
+            margin-top: 0.4rem;
+            font-size: 1.2rem;
+        }
+
+        /* FORM SECTION */
+        .form-section {
+            padding: 1.8rem 2rem;
+        }
+
+        .form-label {
+            font-size: 1.25rem;
+            font-weight: 600;             /* SAME as Restart Tour */
+            letter-spacing: 0.12em;        /* SAME */
+            color: #3b2c20;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;              /* SAME as Restart Tour */
+            letter-spacing: 0.12em;         /* SAME */
+            font-size: 1.1rem;
+            border: 2px solid #d4c2ad;
+            border-radius: 10px;
+            background: #fffaf3;
+        }
+
+        .form-textarea {
+            min-height: 90px;
+            resize: none;
+        }
+
+        /* RATING BOX */
+        .rating-section {
+            margin: 1rem 0;
+            padding: 1.2rem;
+            background: #f7efe4;
+            border-radius: 12px;
+            border: 1px solid #d8c7b3;
+            text-align: center;
+            font-weight: 600;        /* SAME as Restart Tour */
+            letter-spacing: 0.12em;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            cursor: pointer;
+            color: #c9b8a2;
+            transition: 0.3s;
+        }
+
+        .star.active {
+            color: #ffcf6d;
+            text-shadow: 0 0 18px rgba(255, 207, 109, 1);
+        }
+
+        /* SUBMIT BUTTON */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.3rem;
+            font-weight: 700;            /* SAME as Restart Tour */
+            letter-spacing: 0.12em;       /* SAME */
+            background: linear-gradient(to right, #4d3625, #3c2b1f);
+            color: #f7e7c9;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.32);
+        }
+
+        .extra-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.7rem;
+            border: 2px solid #6a4b33;
+            border-radius: 10px;
+            background: transparent;
+            font-size: 1.15rem;
+            font-weight: 700;             /* SAME */
+            letter-spacing: 0.12em;        /* SAME */
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: #6a4b33;
+            color: #f7e7c9;
+        }
+
+        /* POPUP */
+        .rating-popup {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(50, 30, 20, 0.95);
+            color: #f8e7cc;
+            padding: 1rem 1.6rem;
+            font-size: 1.2rem;
+            font-weight: 700;           /* SAME */
+            letter-spacing: 0.12em;      /* SAME */
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .rating-popup.show {
+            opacity: 1;
+        }
+        /* PAGE TRANSITION OVERLAY */
+.page-transition {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 0.8s ease;
+}
+
+.page-transition.active {
+    opacity: 1;
+}
+
+    </style>
+</head>
+
+
+<body>
+
+    <div class="feedback-container">
+        <div class="feedback-header">
+            <h1>Share Your Experience</h1>
+            <p>Your thoughts inspire us ✨</p>
+        </div>
+
+        <div class="form-section">
+            <form id="feedbackForm">
+
+                <label class="form-label">Your Name *</label>
+                <input class="form-input" id="visitorName">
+
+                <label class="form-label">Email *</label>
+                <input class="form-input" id="visitorEmail">
+
+                <div class="rating-section">
+                    <p class="form-label">Rate Your Experience</p>
+                    <div id="starContainer">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                </div>
+
+                <label class="form-label">Your Comments</label>
+                <textarea class="form-textarea" id="comments"></textarea>
+
+                <button class="submit-btn" type="submit">SUBMIT FEEDBACK</button>
+
+                <div class="extra-buttons">
+                    <button type="button" class="action-btn" onclick="window.location.href='home_page.html'">Restart Tour</button>
+                    <button type="button" class="action-btn" onclick="shareExperience()">Share</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="rating-popup" id="ratingPopup">Thanks for rating!</div>
+
+<script>
+const ratingMessages = {
+    1: "Poor Experience 😞",
+    2: "Average Experience 🙂",
+    3: "Good Experience 🙂",
+    4: "Excellent Experience 🤩",
+    5: "Outstanding Experience ✨"
+};
+
+function showRatingPopup(message) {
+    const popup = document.getElementById("ratingPopup");
+    popup.innerText = message;
+    popup.classList.add("show");
+
+    setTimeout(() => popup.classList.remove("show"), 2000);
+}
+
+let selectedRating = 0;
+
+document.querySelectorAll(".star").forEach(star => {
+    star.addEventListener("click", () => {
+        selectedRating = parseInt(star.dataset.rating);
+        updateStars();
+        showRatingPopup(ratingMessages[selectedRating]);
+    });
+});
+
+function updateStars() {
+    document.querySelectorAll(".star").forEach(star => {
+        star.classList.toggle("active", star.dataset.rating <= selectedRating);
+    });
+}
+
+document.getElementById("feedbackForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Thank you! Your feedback has been submitted.");
+});
+
+function shareExperience() {
+    alert("Share link copied!");
+}
+
+function smoothGoTo(url) {
+    const pt = document.getElementById("pageTransition");
+    pt.classList.add("active");
+
+    setTimeout(() => {
+        window.location.href = url;
+    }, 800);  // same timing as fade animation
+}
+
+</script>
+<div class="page-transition" id="pageTransition"></div>
+
+</body>
+</html>
